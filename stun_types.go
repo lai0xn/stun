@@ -78,7 +78,8 @@ const (
 // Header represents the STUN message header.
 type Header struct {
     Type           STUN_MESSAGE_TYPE // Type of STUN message (e.g., Binding Request, Binding Response)
-    Length         uint8             // Length of the message or attribute data
+    Length         uint16       // Length of the message or attribute data
+    MagicCookie    uint32
     TransactionID  [12]byte          // 12-byte Transaction ID to uniquely identify the request/response
 }
 
