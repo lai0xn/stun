@@ -23,6 +23,7 @@ func (s udpServer) Listen() error{
 	}
 	log.Println("server started listening on ",addr)
 	conn,err := net.ListenUDP("udp4",udpAddr)
+
 	if err != nil {
 		return err
 	}
@@ -33,14 +34,15 @@ func (s udpServer) Listen() error{
 func HandleUDPConn(conn net.UDPConn){
 	defer conn.Close()
 	buff := make([]byte,1024)
-	header := Header{}
 	for {
 		_,_,err := conn.ReadFromUDP(buff)
 		if err != nil {
 			return
 		}
-		header.Type = STUN_MESSAGE_TYPE(uint16(buff[0]) << 8 | uint16(buff[1]))
-	}	
+    header := DecodeHeader(buff)
+    ip := conn.
+	}
+
 }
 
 func (s udpServer) Shutdown() error{

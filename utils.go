@@ -1,7 +1,6 @@
 package stunlib
 
 import (
-	"encoding/binary"
 	"fmt"
 	"net"
 )
@@ -33,6 +32,30 @@ func DecodeHeader(buff []byte) *Header {
 	return header
 }
 
+func EncodeHeader(header Header) []byte {
+    // Allocate a 20-byte slice for the STUN header (2 + 2 + 4 + 12 bytes)
+    buff := make([]byte, 20)
+    
+    // Encode the message type (2 bytes)
+    buff[0] = byte(header.Type >> 8)    // High byte
+    buff[1] = byte(header.Type & 0xff)  // Low byte
+    
+    // Encode the message length (2 bytes)
+    buff[2] = byte(header.Length >> 8)  // High byte
+    buff[3] = byte(header.Length & 0xff) // Low byte
+    
+    // Encode the magic cookie (4 bytes)
+    buff[4] = byte(header.MagicCookie >> 24) // Highest byte
+    buff[5] = byte(header.MagicCookie >> 16)
+    buff[6] = byte(header.MagicCookie >> 8)
+    buff[7] = byte(header.MagicCookie & 0xff) // Lowest byte
+    
+    // Copy the transaction ID (12 bytes)
+    copy(buff[8:], header.TransactionID[:])
+    
+    return buff
+}
+
 // SerializeAddr takes an ip and port and encodes into a byte slice
 func SerializeAddr(ip net.IP,port uint16) ([]byte,error) {
 	// Check if the IP is IPv4
@@ -51,7 +74,8 @@ func SerializeAddr(ip net.IP,port uint16) ([]byte,error) {
 	copy(mappedAddress[1:5], ipv4)
 
 	// Serialize the 16-bit port into two bytes (big-endian)
-	binary.BigEndian.PutUint16(mappedAddress[5:7], port)
+	mappedAddress[5] = uint8(port >> 8 )
+  mappedAddress[6] = uint8(port & 0xff)
 
 	// Return the serialized mapped address
 	return mappedAddress, nil

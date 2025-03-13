@@ -14,7 +14,7 @@ const (
     // It contains the client's mapped address and port, allowing NAT traversal.
     STUN_BINDING_RESPONSE STUN_MESSAGE_TYPE = 0x0101
 
-    // STUN_ERROR_RESPONSE represents the Error Response message type (0x0111),
+    // STUN_ERROR_RESPONSE represents the Error Response message type  (0x0111),
     // which is sent by the STUN server when there is an error processing the request.
     // It includes an error code and description to notify the client of the issue.
     STUN_ERROR_RESPONSE   STUN_MESSAGE_TYPE = 0x0111
