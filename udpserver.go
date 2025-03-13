@@ -6,45 +6,44 @@ import (
 	"time"
 )
 
-
 type udpServer struct {
-	addr string
-	port string
+	addr    string
+	port    string
 	timeout time.Duration
 }
 
-func (s udpServer) Listen() error{
-	
-	addr := net.JoinHostPort(s.addr,s.port)
-	udpAddr,err := net.ResolveUDPAddr("udp",addr)
-	
-	if err != nil {
-		return err
-	}
-	log.Println("server started listening on ",addr)
-	conn,err := net.ListenUDP("udp4",udpAddr)
+func (s udpServer) Listen() error {
+
+	addr := net.JoinHostPort(s.addr, s.port)
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 
 	if err != nil {
 		return err
 	}
-	HandleUDPConn(*conn)		
-	return nil
-}
+	log.Println("server started listening on ", addr)
+	conn, err := net.ListenUDP("udp4", udpAddr)
 
-func HandleUDPConn(conn net.UDPConn){
+	if err != nil {
+		return err
+	}
+
 	defer conn.Close()
-	buff := make([]byte,1024)
-	for {
-		_,_,err := conn.ReadFromUDP(buff)
-		if err != nil {
-			return
-		}
-    header := DecodeHeader(buff)
-    ip := conn.
-	}
 
+	for {
+		go HandleUDPConn(*conn)
+
+	}
 }
 
-func (s udpServer) Shutdown() error{
+func HandleUDPConn(conn net.UDPConn) {
+	buff := make([]byte, 1024)
+	_, _, err := conn.ReadFromUDP(buff)
+	if err != nil {
+		return
+	}
+	_ = DecodeHeader(buff)
+}
+
+func (s udpServer) Shutdown() error {
 	return nil
 }
