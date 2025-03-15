@@ -85,7 +85,7 @@ type Header struct {
 
 // Attr represents a STUN message attribute.
 type Attr struct {
-    Length uint8  // Length of the attribute value
+    Length uint16// Length of the attribute value
     Type   STUN_ATTR // Type of the attribute (e.g., MAPPED-ADDRESS, USERNAME)
     Value  []byte // The value of the attribute (could be IP address, username, etc.)
 }
