@@ -13,7 +13,7 @@ func DecodeHeader(buff []byte) *Header {
 	// Decode the STUN message type (2 bytes) and assign it to header.Type
 	// Combine the first byte and second byte into a uint16 value using bitwise shifting
 	// The first byte is shifted left by 8 bits, then the second byte is OR-ed with it
-	header.Type = STUN_MESSAGE_TYPE(uint16(buff[0])<<8 | uint16(buff[1]))
+	header.Type = MessageType(uint16(buff[0])<<8 | uint16(buff[1]))
 
 	// Decode the message length (2 bytes) and assign it to header.Length
 	// Combine the third byte and fourth byte into a uint16 value using bitwise shifting
@@ -58,9 +58,9 @@ func EncodeHeader(header Header) []byte {
 
 // DecodeStunAttr decodes a single STUN attribute from the given byte buffer.
 // The STUN attribute format is as follows:
-func DecodeStunAttr(buff []byte) Attr {
+func DecodeStunAttr(buff []byte) Attribute {
 	// Extract the attribute type (first 2 bytes)
-	attrType := STUN_ATTR(uint16(buff[0])<<8 | uint16(buff[1]))
+	attrType := StunAttribute(uint16(buff[0])<<8 | uint16(buff[1]))
 
 	// Extract the attribute length (next 2 bytes)
 	attrLen := uint16(buff[2])<<8 | uint16(buff[3])
@@ -68,24 +68,23 @@ func DecodeStunAttr(buff []byte) Attr {
 	// Calculate the padded length of the attribute value
 	// STUN attributes are padded to a multiple of 4 bytes
 	paddedLen := int(attrLen)
-  fmt.Println(attrType == ATTR_XOR_MAPPED_ADDRESS)
 	if paddedLen%4 != 0 {
 		paddedLen = paddedLen + 4 - (paddedLen % 4)
 	}
 
-	return Attr{
+	return Attribute{
 		Type:      attrType,
 		Length:    attrLen,
 		Value:     buff[4 : 4+paddedLen],
-		PaddedLen: paddedLen,
+		PaddedLength: paddedLen,
 	}
 }
 
 // DecodeAttrs decodes multiple STUN attributes from the given byte buffer.
 // It iterates through the buffer, decoding each attribute and adding it to a slice.
-func DecodeAttrs(buff []byte, length int) []Attr {
+func DecodeAttrs(buff []byte, length int) []Attribute {
 	offset := 0
-	var attrs []Attr
+	var attrs []Attribute
 
 	// Loop through the buffer until the entire length is processed
 	for offset < length {
@@ -97,7 +96,7 @@ func DecodeAttrs(buff []byte, length int) []Attr {
 
 		// Move the offset to the start of the next attribute
 		// Each attribute has a 4-byte header (type + length) plus the padded value
-		offset += 4 + attr.PaddedLen
+		offset += 4 + attr.PaddedLength
 	}
 
 	// Return the slice of decoded attributes
@@ -123,7 +122,8 @@ func SerializeAddr(ip net.IP, port uint16) ([]byte, error) {
 
 	// Serialize the 16-bit port into two bytes (big-endian)
 	mappedAddress[5] = uint8(port >> 8)
-	mappedAddress[6] = uint8(port & 0xff)
+  
+  mappedAddress[6] = uint8(port & 0xff)
 
 	// Return the serialized mapped address
 	return mappedAddress, nil

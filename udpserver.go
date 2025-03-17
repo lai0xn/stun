@@ -1,6 +1,7 @@
 package stunlib
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -41,7 +42,10 @@ func HandleUDPConn(conn net.UDPConn) {
 	if err != nil {
 		return
 	}
-	_ = DecodeHeader(buff)
+	header := DecodeHeader(buff)
+	attrs := DecodeAttrs(buff[21:], int(header.Length))
+	fmt.Println(attrs)
+	fmt.Println(attrs)
 }
 
 func (s udpServer) Shutdown() error {
