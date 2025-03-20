@@ -3,6 +3,8 @@ package stunlib
 // STUN Message Types
 type MessageType uint16
 
+type Attributes []Attribute
+
 const (
 	// BindingRequest represents the Binding Request message type (0x0001),
 	// which is used by the client to initiate a STUN transaction.
@@ -72,24 +74,7 @@ const (
 	XORMappedAddressLength  = 12 // 12 bytes for XOR-MAPPED-ADDRESS (XOR encoded IPv4 + port)
 )
 
-// Header represents the STUN message header.
-type Header struct {
-	Type          MessageType // Type of STUN message (e.g., Binding Request, Binding Response)
-	Length        uint16      // Length of the message or attribute data
-	MagicCookie   uint32
-	TransactionID [12]byte // 12-byte Transaction ID to uniquely identify the request/response
-}
 
-// Attribute represents a STUN message attribute.
-type Attribute struct {
-	Length      uint16   // Length of the attribute value
-	Type        StunAttribute // Type of the attribute (e.g., MAPPED-ADDRESS, USERNAME)
-	PaddedLength int     // Length of the attribute value after padding (must be a multiple of 4)
-	Value       []byte   // The value of the attribute (could be IP address, username, etc.)
-}
 
-// Message represents a full STUN message, including its header and attributes.
-type Message struct {
-	Header
-	Attributes []Attribute
-}
+
+

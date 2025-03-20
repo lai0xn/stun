@@ -25,7 +25,7 @@ func (client *Client) Dial(){
   if err != nil {
     panic(err)
   }
-  encodedHeader := EncodeHeader(header)
+  encodedHeader := header.Encode()
 
   c,err := net.DialUDP("udp4",nil,udpAddr)
   if err != nil {
@@ -43,8 +43,8 @@ func (client *Client) Dial(){
     panic(err)
   }
   fmt.Println(n)
-  resHeader := DecodeHeader(buff)
-  attrs := DecodeAttrs(buff[20:n],int(resHeader.Length))
+  resHeader := decodeHeader(buff)
+  attrs := decodeAttrs(buff[20:n],int(resHeader.Length))
   fmt.Println(resHeader.Length)
   fmt.Println(attrs)
 }

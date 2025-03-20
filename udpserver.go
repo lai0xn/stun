@@ -42,8 +42,8 @@ func HandleUDPConn(conn net.UDPConn) {
 	if err != nil {
 		return
 	}
-	header := DecodeHeader(buff)
-	attrs := DecodeAttrs(buff[21:], int(header.Length))
+	header := decodeHeader(buff)
+	attrs := decodeAttrs(buff[21:], int(header.Length))
 	fmt.Println(attrs)
 	fmt.Println(attrs)
 }
