@@ -11,7 +11,7 @@ const IPV4 IPFamily = 0x01
 const IPV6 IPFamily = 0x02
 
 type XorMappedAddr struct {
-  Family uint8
+  Family IPFamily
   IP net.IP
   port uint16
 }
@@ -43,7 +43,21 @@ func SerializeAddr(addr XorMappedAddr) ([]byte, error) {
 	return mappedAddress, nil
 }
 
-func DecodeAddr([]byte) XorMappedAddr {
+// DecodeAddr takes an ip and port as bytes and decodes them into XorMappedAddr
+func DecodeAddr(addr []byte) *XorMappedAddr {
+  // Decode IP Family
+  familly := addr[0]
+
+  ip := make([]byte,4)
+  net.IPv4(ip[0],ip[1],ip[2],ip[3])
   
+  port := uint16(uint16(addr[5]) << 8 | uint16(addr[6]))
+  
+  return &XorMappedAddr{
+    Family: IPFamily(familly),
+    IP: ip,
+    port: port,
+  }
+
 } 
 
