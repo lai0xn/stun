@@ -1,4 +1,19 @@
-package stunlib
+package stun
+
+
+//0                   1                   2                   3
+//       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//      |0 0|     STUN Message Type     |         Message Length        |
+//      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//      |                         Magic Cookie                          |
+//      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//      |                                                               |
+//      |                     Transaction ID (96 bits)                  |
+//      |                                                               |
+//     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+//                  Figure 2: Format of STUN Message Header
 
 // Header represents the STUN message header.
 type Header struct {
@@ -9,7 +24,7 @@ type Header struct {
 }
 
 // DecodeHeader takes a byte slice (buff) and decodes it into a STUN message header.
-func decodeHeader(buff []byte) *Header {
+func decodeHeader(buff []byte) (*Header, error) {
 	// Create a new Header object to store the decoded values
 	header := new(Header)
 
@@ -26,13 +41,15 @@ func decodeHeader(buff []byte) *Header {
 	// MagicCookie is a fixed 4-byte value, so we combine 4 bytes (from index 4 to 7)
 	// into a uint32 value using bitwise shifting and OR-ing the individual bytes
 	header.MagicCookie = uint32(uint32(buff[4])<<24 | uint32(buff[5])<<16 | uint32(buff[6])<<8 | uint32(buff[7]))
-
+	if header.MagicCookie != magicCookie {
+		return nil, ErrInvalidCookie
+	}
 	// Copy the remaining bytes (Transaction ID) into the header.TransactionID field
 	// The TransactionID is 12 bytes long, so we copy from index 8 to the end of the buffer
 	copy(header.TransactionID[:], buff[8:])
 
 	// Return the decoded header
-	return header
+	return header, nil
 }
 
 func encodeHeader(header Header) []byte {
@@ -60,5 +77,5 @@ func encodeHeader(header Header) []byte {
 }
 
 func (h *Header) Encode() []byte {
-  return encodeHeader(*h)
+	return encodeHeader(*h)
 }

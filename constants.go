@@ -1,9 +1,13 @@
-package stunlib
+package stun
+
+import "errors"
 
 // STUN Message Types
 type MessageType uint16
 
 type Attributes []Attribute
+
+const headrLength = 20
 
 const (
 	// BindingRequest represents the Binding Request message type (0x0001),
@@ -63,18 +67,34 @@ const (
 	XORMappedAddress StunAttribute = 0x0020
 )
 
-// StunAttribute Lengths, attributes with 0 as value have variable lengths
-const (
-	MappedAddressLength     = 12 // 12 bytes for MAPPED-ADDRESS (IPv4 + port)
-	MessageIntegrityLength  = 20 // 20 bytes for MESSAGE-INTEGRITY (SHA1)
-	ErrorCodeLength         = 4  // 4 bytes for ERROR-CODE
-	UnknownStunAttributesLength = 0  // Unknown attributes can be of variable length
-	RealmLength             = 0  // REALM can be variable length
-	NonceLength             = 0  // NONCE can be variable length
-	XORMappedAddressLength  = 12 // 12 bytes for XOR-MAPPED-ADDRESS (XOR encoded IPv4 + port)
+var (
+	ErrAttrNotFound  = errors.New("attribute not found")
+	ErrShortBuffer   = errors.New("buffer too short for reading")
+	ErrInvalidCookie = errors.New("invalid magic cookie")
+	ErrShortWrite    = errors.New("short byte write")
 )
 
+// StunAttribute Lengths, attributes with 0 as value have variable lengths
+const (
+	MappedAddressLength         = 8  // 8 bytes for MAPPED-ADDRESS (IPv4 Value only)
+	MessageIntegrityLength      = 20 // 20 bytes for MESSAGE-INTEGRITY (SHA1 HMAC digest)
+	ErrorCodeLength             = 4  // 4 bytes minimal for ERROR-CODE (not including reason phrase)
+	UnknownStunAttributesLength = 0  // Unknown attributes are variable length
+	RealmLength                 = 0  // REALM is variable length
+	NonceLength                 = 0  // NONCE is variable length
+	XORMappedAddressLength      = 8  // 8 bytes for XOR-MAPPED-ADDRESS (IPv4 Value only)
+)
 
-
-
-
+// String returns the string representation of the MessageType
+func (mt MessageType) String() string {
+	switch mt {
+	case BindingRequest:
+		return "BindingRequest"
+	case BindingResponse:
+		return "BindingResponse"
+	case ErrorResponse:
+		return "ErrorResponse"
+	default:
+		return "Unknown"
+	}
+}

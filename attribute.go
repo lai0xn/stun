@@ -1,4 +1,4 @@
-package stunlib
+package stun
 
 // Attribute represents a STUN message attribute.
 type Attribute struct {
