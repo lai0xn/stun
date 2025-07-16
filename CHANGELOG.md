@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Inconsistent error handling patterns
 - Log message formatting and structure
 
-## [0.1.0] - 2023-12-01
+## [0.1.0] - 2025-07-17
 
 ### Added
 - Initial STUN protocol implementation
